@@ -89,6 +89,7 @@ else ifeq ($(CONFIG_OPLUS_SM8250_CHARGER),y)
 
 else
 	obj-y	+= oppo_battery_msm8976.o
-endif 
+endif
 
 	obj-y   += oppo_short_ic.o
+	obj-y	+= op_charge.o

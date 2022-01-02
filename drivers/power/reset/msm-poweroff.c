@@ -85,11 +85,6 @@ static void *emergency_dload_mode_addr;
 static bool scm_dload_supported;
 
 static bool force_warm_reboot;
-
-bool oem_is_fulldump(void)
-{
-	return download_mode && (dload_type & SCM_DLOAD_FULLDUMP);
-}
 /* Jianfeng.Qui@MULTIMEDIA.AUDIODRIVER.FEATURE, 2019/11/26, Add for workaround fix adsp stuck issue */
 #ifdef OPLUS_ARCH_EXTENDS
 EXPORT_SYMBOL(oem_is_fulldump);

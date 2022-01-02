@@ -135,4 +135,7 @@ all.config
 
 # fetched Android config fragments
 kernel/configs/android-*.cfg
+<<<<<<< HEAD
 
+=======
+>>>>>>> c274626a6d9e54e92ac1a0f37f0ba9ab0bbc8c78

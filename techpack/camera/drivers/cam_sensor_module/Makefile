@@ -15,3 +15,4 @@ obj-$(CONFIG_SPECTRA_CAMERA) += cam_ois/
 obj-$(CONFIG_SPECTRA_CAMERA) += oplus/cam_ois/
 obj-$(CONFIG_SPECTRA_CAMERA) += cam_flash/
 obj-$(CONFIG_SPECTRA_CAMERA) += oplus/cam_flash/
+obj-$(CONFIG_SPECTRA_CAMERA) += oplus/

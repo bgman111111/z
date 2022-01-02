@@ -21,6 +21,7 @@
 #include "dsi-panel-sim-dualmipi-dsc375-cmd.dtsi"
 #include "dsi-panel-sim-sec-hd-cmd.dtsi"
 #include "dsi-panel-xrsmrtvwr-jdi-dual-video.dtsi"
+#include "dsi-panel-r66451-dsc-fhd-plus-144hz-cmd.dtsi"
 //#ifdef OPLUS_BUG_STABILITY
 //lisheng@MULTIMEDIA.DISPLAY.LCD, 2020/07/23, modify panel config
 #include "dsi-panel-samsung_oneplus_dsc.dtsi"
@@ -250,8 +251,11 @@
 		vout-supply = <&L2C>;
 		//#endif /*OPLUS_BUG_STABILITY*/
 		avdd-supply = <&display_panel_avdd>;
+		lab-supply = <&ab_vreg>;
+		ibb-supply = <&ibb_vreg>;
 
 		qcom,mdp = <&mdss_mdp>;
+		qcom,dsi-default-panel = <&dsi_sw43404_amoled_cmd>;
 		//#ifdef OPLUS_BUG_STABILITY
 		/*lisheng@MULTIMEDIA.DISPLAY.LCD,2019-10-12 modify for lcd config */
 		qcom,dsi-default-panel = <&dsi_oppo19065_samsung_1440_3168_dsc_cmd>;
@@ -308,7 +312,8 @@
 	/*lisheng@MULTIMEDIA.DISPLAY.LCD,2019-10-12 add for lcd power */
 	msm_notifier: qcom,msm_notifier@0 {
 		compatible = "qcom,msm-notifier";
-		panel = <&dsi_oppo19065_samsung_1440_3168_dsc_cmd>;
+		panel = <&dsi_sw43404_amoled_cmd &dsi_sharp_qsync_wqhd_cmd
+			&dsi_dual_sim_dsc_375_cmd>,<&dsi_oppo19065_samsung_1440_3168_dsc_cmd>;
 	};
 	//#endif /*OPLUS_BUG_STABILITY*/
 };
@@ -966,6 +971,25 @@
 			qcom,default-topology-index = <0>;
 			qcom,panel-roi-alignment = <720 40 720 40 720 40>;
 			qcom,partial-update-enabled = "single_roi";
+		};
+	};
+};
+
+&dsi_r66451_amoled_144hz_cmd {
+	qcom,ulps-enabled;
+	qcom,esd-check-enabled;
+	qcom,mdss-dsi-panel-status-check-mode = "reg_read";
+	qcom,mdss-dsi-panel-status-command = [06 01 00 01 00 00 01 0a];
+	qcom,mdss-dsi-panel-status-command-state = "dsi_lp_mode";
+	qcom,mdss-dsi-panel-status-value = <0x1c>;
+	qcom,mdss-dsi-panel-status-read-length = <1>;
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
+	qcom,mdss-dsi-display-timings {
+		timing@0 {
+			qcom,mdss-dsi-panel-phy-timings = [00 22 09 09 19 17 09
+					09 09 02 04 00 1d 0e];
+			qcom,display-topology = <2 2 1>;
+			qcom,default-topology-index = <0>;
 		};
 	};
 };

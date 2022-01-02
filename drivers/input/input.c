@@ -29,7 +29,6 @@
 #include <linux/rcupdate.h>
 #include "input-compat.h"
 
-
 MODULE_AUTHOR("Vojtech Pavlik <vojtech@suse.cz>");
 MODULE_DESCRIPTION("Input core");
 MODULE_LICENSE("GPL");

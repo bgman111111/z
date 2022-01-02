@@ -13,6 +13,8 @@
 #include "dsi_panel.h"
 #include "dsi_ctrl_hw.h"
 #include "dsi_parser.h"
+#include "sde_dbg.h"
+
 #if defined(OPLUS_FEATURE_PXLW_IRIS5)
 // Pixelworks@MULTIMEDIA.DISPLAY, 2020/06/02, Iris5 Feature
 #include "../../iris/dsi_iris5_api.h"
@@ -27,6 +29,7 @@
 #include "oppo_onscreenfingerprint.h"
 #include "oppo_aod.h"
 #endif
+
 /**
  * topology is currently defined by a set of following 3 values:
  * 1. num of layer mixers
@@ -97,6 +100,7 @@ static char dsi_dsc_rc_range_max_qp_1_1[][15] = {
 	{12, 12, 13, 14, 15, 15, 15, 16, 17, 18, 19, 20, 21, 21, 23},
 	{7, 8, 9, 10, 11, 11, 11, 12, 13, 13, 14, 14, 15, 15, 16},
 	};
+
 /*
  * DSC 1.1 SCR
  * Rate control - Max QP values for each ratio type in dsi_dsc_ratio_type
@@ -414,6 +418,7 @@ int dsi_panel_trigger_esd_attack(struct dsi_panel *panel)
 
 	if (gpio_is_valid(r_config->reset_gpio)) {
 		gpio_set_value(r_config->reset_gpio, 0);
+		SDE_EVT32(SDE_EVTLOG_FUNC_CASE1);
 		DSI_INFO("GPIO pulled low to simulate ESD\n");
 		return 0;
 	}
@@ -681,6 +686,7 @@ int dsi_panel_tx_cmd_set(struct dsi_panel *panel,
 	cmds = mode->priv_info->cmd_sets[type].cmds;
 	count = mode->priv_info->cmd_sets[type].count;
 	state = mode->priv_info->cmd_sets[type].state;
+	SDE_EVT32(type, state, count);
 
 #ifdef OPLUS_BUG_STABILITY
 /* Gou shengjun@PSW.MM.Display.LCD.Stability,2018/12/13
@@ -856,9 +862,9 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 	if (oppo_dimlayer_bl_enabled != oppo_dimlayer_bl_enable_real) {
 		oppo_dimlayer_bl_enable_real = oppo_dimlayer_bl_enabled;
 		if (oppo_dimlayer_bl_enable_real) {
-			pr_err("Enter DC backlight\n");
+			pr_info("Enter DC backlight\n");
 		} else {
-			pr_err("Exit DC backlight\n");
+			pr_info("Exit DC backlight\n");
 		}
 	}
 
@@ -984,6 +990,7 @@ int dsi_panel_set_backlight(struct dsi_panel *panel, u32 bl_lvl)
 
 	if (panel->host_config.ext_bridge_mode)
 		return 0;
+
 	DSI_DEBUG("backlight type:%d lvl:%d\n", bl->type, bl_lvl);
 	switch (bl->type) {
 	case DSI_BACKLIGHT_WLED:
@@ -1462,6 +1469,9 @@ static int dsi_panel_parse_misc_host_config(struct dsi_host_common_cfg *host,
 		host->t_clk_pre = val;
 		DSI_DEBUG("[%s] t_clk_pre = %d\n", name, val);
 	}
+
+	host->t_clk_pre_extend = utils->read_bool(utils->data,
+						"qcom,mdss-dsi-t-clk-pre-extend");
 
 	host->ignore_rx_eot = utils->read_bool(utils->data,
 						"qcom,mdss-dsi-rx-eot-ignore");
@@ -4783,6 +4793,7 @@ int dsi_panel_send_roi_dcs(struct dsi_panel *panel, int ctrl_idx,
 	}
 	DSI_DEBUG("[%s] send roi x %d y %d w %d h %d\n", panel->name,
 			roi->x, roi->y, roi->w, roi->h);
+	SDE_EVT32(roi->x, roi->y, roi->w, roi->h);
 
 	mutex_lock(&panel->panel_lock);
 
@@ -4905,7 +4916,6 @@ int dsi_panel_switch(struct dsi_panel *panel)
 	pr_err("Send DSI_CMD_SET_TIMING_SWITCH cmds\n");
 #else
 	rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_TIMING_SWITCH);
-	pr_err("Send DSI_CMD_SET_TIMING_SWITCH cmds\n");
 #endif
 	if (rc)
 		DSI_ERR("[%s] failed to send DSI_CMD_SET_TIMING_SWITCH cmds, rc=%d\n",
@@ -4933,10 +4943,8 @@ int dsi_panel_post_switch(struct dsi_panel *panel)
 			&(panel->cur_mode->priv_info->cmd_sets[DSI_CMD_SET_POST_TIMING_SWITCH]), &panel->cur_mode->timing);
 	else
 		rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_POST_TIMING_SWITCH);
-	pr_err("Send DSI_CMD_SET_POST_TIMING_SWITCH cmds\n");
 #else
 	rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_POST_TIMING_SWITCH);
-	pr_err("Send DSI_CMD_SET_POST_TIMING_SWITCH cmds\n");
 #endif
 
 	if (rc)

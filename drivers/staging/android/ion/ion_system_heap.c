@@ -747,7 +747,7 @@ static int ion_system_heap_debug_show(struct ion_heap *heap, struct seq_file *s,
 	return 0;
 }
 
-void ion_system_heap_destroy_pools(struct ion_page_pool **pools)
+static void ion_system_heap_destroy_pools(struct ion_page_pool **pools)
 {
 	int i;
 
@@ -765,9 +765,9 @@ void ion_system_heap_destroy_pools(struct ion_page_pool **pools)
  * nothing. If it succeeds you'll eventually need to use
  * ion_system_heap_destroy_pools to destroy the pools.
  */
-int ion_system_heap_create_pools(struct ion_system_heap *sys_heap,
+static int ion_system_heap_create_pools(struct ion_system_heap *sys_heap,
 					struct ion_page_pool **pools,
-					bool cached, bool graphic_buffer_flag)
+					bool cached)
 {
 	int i;
 
@@ -781,7 +781,6 @@ int ion_system_heap_create_pools(struct ion_system_heap *sys_heap,
 		if (!pool)
 			goto err_create_pool;
 		pool->dev = sys_heap->heap.priv;
-		pool->graphic_buffer_flag = graphic_buffer_flag;
 		pools[i] = pool;
 	}
 	return 0;
@@ -863,13 +862,13 @@ struct ion_heap *ion_system_heap_create(struct ion_platform_heap *data)
 		if (is_secure_vmid_valid(i))
 			if (ion_system_heap_create_pools(heap,
 							 heap->secure_pools[i],
-							 false, false))
+							 false))
 				goto destroy_secure_pools;
 
-	if (ion_system_heap_create_pools(heap, heap->uncached_pools, false, false))
+	if (ion_system_heap_create_pools(heap, heap->uncached_pools, false))
 		goto destroy_secure_pools;
 
-	if (ion_system_heap_create_pools(heap, heap->cached_pools, true, false))
+	if (ion_system_heap_create_pools(heap, heap->cached_pools, true))
 		goto destroy_uncached_pools;
 
 	if (pool_auto_refill_en) {

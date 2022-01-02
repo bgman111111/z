@@ -659,6 +659,7 @@ source "drivers/misc/colorctrl/Kconfig"
 source "drivers/misc/aw8697_haptic/Kconfig"
 #endif
 source "drivers/misc/fpr_FingerprintCard/Kconfig"
+source "drivers/misc/qrc/Kconfig"
 endmenu
 
 config OKL4_USER_VIPC

@@ -62,6 +62,14 @@ struct dm_verity_prefetch_work {
 struct buffer_aux {
 	int hash_verified;
 };
+/*
+ * While system shutdown, skip verity work for I/O error.
+ */
+static inline bool verity_is_system_shutting_down(void)
+{
+	return system_state == SYSTEM_HALT || system_state == SYSTEM_POWER_OFF
+		|| system_state == SYSTEM_RESTART;
+}
 
 /*
  * Initialize struct buffer_aux for a freshly created buffer.
@@ -255,13 +263,7 @@ out:
 #ifdef CONFIG_DM_VERITY_AVB
 		dm_verity_avb_error_handler();
 #endif
-
-#ifdef OPLUS_BUG_STABILITY
-// Bin.Xu@BSP.Kernel.Stability, 2020/4/15, add feature: feedback 2.0, monitor abnormal restart
-		panic("dm-verity device corrupted");
-#else
 		kernel_restart("dm-verity device corrupted");
-#endif /* OPLUS_BUG_STABILITY */
 	}
 
 	return 1;
@@ -570,7 +572,8 @@ static void verity_end_io(struct bio *bio)
 {
 	struct dm_verity_io *io = bio->bi_private;
 
-	if (bio->bi_status && !verity_fec_is_enabled(io->v)) {
+	if (bio->bi_status &&
+		(!verity_fec_is_enabled(io->v) || verity_is_system_shutting_down())) {
 		verity_finish_io(io, bio->bi_status);
 		return;
 	}

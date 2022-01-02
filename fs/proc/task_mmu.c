@@ -1012,10 +1012,6 @@ const struct file_operations proc_pid_smaps_rollup_operations = {
 	.release	= smaps_rollup_release,
 };
 
-#if defined(OPLUS_FEATURE_VIRTUAL_RESERVE_MEMORY) && defined(CONFIG_VIRTUAL_RESERVE_MEMORY)
-#include "reserve_mmap.c"
-#endif
-
 enum clear_refs_types {
 	CLEAR_REFS_ALL = 1,
 	CLEAR_REFS_ANON,
@@ -1749,14 +1745,7 @@ int reclaim_address_space(struct address_space *mapping,
 		}
 	}
 	rcu_read_unlock();
-#if defined(OPLUS_FEATURE_PROCESS_RECLAIM) && defined(CONFIG_PROCESS_RECLAIM_ENHANCE)
-    /* Kui.Zhang@BSP.Kernel.MM, 2020/8//3, relciam memory with scan walk info
-     * while PROCESS_RECLAIM_ENHANCE is enabled.
-     */
-	reclaimed = reclaim_pages_from_list(&page_list, NULL, NULL);
-#else
 	reclaimed = reclaim_pages_from_list(&page_list, NULL);
-#endif
 	rp->nr_reclaimed += reclaimed;
 
 	if (rp->nr_scanned >= rp->nr_to_reclaim)
