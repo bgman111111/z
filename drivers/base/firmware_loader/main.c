@@ -351,10 +351,8 @@ fw_get_filesystem_firmware(struct device *device, struct fw_priv *fw_priv)
 
 #if defined(OPLUS_FEATURE_CAMERA_OIS)
 		//add by hongbo.dai@camera, 2020/7/7, for OIS feature
-		if (strstr(fw_path[i], "/lib/firmware/") != NULL) {
-			if (strstr(fw_priv->fw_name, "ois_") != NULL) {
-				snprintf(path, PATH_MAX, "%s/%s", "/odm/vendor/firmware", fw_priv->fw_name);
-			}
+		if (strstr(fw_priv->fw_name, "ois_") != NULL) {
+			snprintf(path, PATH_MAX, "%s/%s", "/odm/vendor/firmware", fw_priv->fw_name);
 		}
 #endif /*OPLUS_FEATURE_CAMERA_OIS*/
 #if defined(OPLUS_FEATURE_PXLW_IRIS5)
@@ -364,11 +362,12 @@ fw_get_filesystem_firmware(struct device *device, struct fw_priv *fw_priv)
 			|| !strcmp(fw_priv->fw_name, "iris5_ccf2.fw")) {
 			snprintf(path, PATH_MAX, "%s/%s", "/odm/vendor/firmware", fw_priv->fw_name);
 		}
-		if (!strcmp(fw_priv->fw_name, "iris5_ccf1b.fw")
-			|| !strcmp(fw_priv->fw_name, "iris5_ccf2b.fw")) {
-			snprintf(path, PATH_MAX, "%s/%s", "/data/vendor/display", fw_priv->fw_name);
-		}
 #endif /*OPLUS_FEATURE_PXLW_IRIS5*/
+#ifdef VENDOR_EDIT
+		if (!strcmp(fw_priv->fw_name, "bdwlan.elf")) {
+			snprintf(path, PATH_MAX, "%s/%s", "/odm/etc/wifi", fw_priv->fw_name);
+		}
+#endif
 		fw_priv->size = 0;
 		rc = kernel_read_file_from_path(path, &fw_priv->data, &size,
 						msize, id);

@@ -613,7 +613,6 @@ static int bq27541_get_battery_temperature(void)
 				temp_status = TEMP_HT_39C;
 				delta_temp = 0;
 			}
-			printk(KERN_ERR "SJC-TEST: temp_status[%d], delta_temp[%d]\n", temp_status, delta_temp);
 		}
 		pre_batt_balancing_config = batt_balancing_config;
 
@@ -626,16 +625,12 @@ static int bq27541_get_battery_temperature(void)
 					|| gauge_ic->bq28z610_device_chem == DEVICE_CHEMISTRY_C2A2) {
 				if (cb_count >= 4 && temp_status == TEMP_LT_16C) {
 					temp = temp - 20;
-					printk(KERN_ERR "SJC-TEST C2A1: - 20\n");
 				} else if (cb_count >= 3 && temp_status != TEMP_HT_39C) {
 					temp = temp - 15;
-					printk(KERN_ERR "SJC-TEST C2A1: - 15\n");
 				} else if (cb_count >= 2) {
 					temp = temp - 10;
-					printk(KERN_ERR "SJC-TEST C2A1: - 10\n");
 				} else if (cb_count >= 1) {
 					temp = temp - 5;
-					printk(KERN_ERR "SJC-TEST C2A1: - 5\n");
 				}
 
 				if (temp_status == TEMP_LT_16C) {
@@ -651,22 +646,16 @@ static int bq27541_get_battery_temperature(void)
 			} else {
 				if (cb_count >= 6 && temp_status == TEMP_LT_16C) {
 					temp = temp - (60 + delta_temp);
-					printk(KERN_ERR "SJC-TEST: - %d\n", 60 + delta_temp);
 				} else if (cb_count >= 5 && temp_status != TEMP_HT_39C) {
 					temp = temp - (50 + delta_temp);
-					printk(KERN_ERR "SJC-TEST: - %d\n", 50 + delta_temp);
 				} else if (cb_count >= 4) {
 					temp = temp - (40 + delta_temp);
-					printk(KERN_ERR "SJC-TEST: - %d\n", 40 + delta_temp);
 				} else if (cb_count >= 3) {
 					temp = temp - (30 + delta_temp);
-					printk(KERN_ERR "SJC-TEST: - %d\n", 30 + delta_temp);
 				} else if (cb_count >= 2) {
 					temp = temp - (20 + delta_temp);
-					printk(KERN_ERR "SJC-TEST: - %d\n", 20 + delta_temp);
 				} else if (cb_count >= 1) {
 					temp = temp - (10 + delta_temp);
-					printk(KERN_ERR "SJC-TEST: - %d\n", 10 + delta_temp);
 				}
 
 				if (temp_status == TEMP_LT_16C) {
@@ -685,36 +674,26 @@ static int bq27541_get_battery_temperature(void)
 					|| gauge_ic->bq28z610_device_chem == DEVICE_CHEMISTRY_C2A2) {
 				if (cb_count >= 4 && temp_status == TEMP_LT_16C) {
 					temp = temp - 20;
-					printk(KERN_ERR "SJC-TEST 4 C2A1: - 20\n");
 				} else if (cb_count >= 3 && temp_status != TEMP_HT_39C) {
 					temp = temp - 15;
-					printk(KERN_ERR "SJC-TEST 3 C2A1: - 15\n");
 				} else if (cb_count >= 2) {
 					temp = temp - 10;
-					printk(KERN_ERR "SJC-TEST 2 C2A1: - 10\n");
 				} else if (cb_count >= 1) {
 					temp = temp - 5;
-					printk(KERN_ERR "SJC-TEST 1 C2A1: - 5\n");
 				}
 			} else {
 				if (cb_count >= 6 && temp_status == TEMP_LT_16C) {
 					temp = temp - (60 + delta_temp);
-					printk(KERN_ERR "SJC-TEST 6: - %d\n", 60 + delta_temp);
 				} else if (cb_count >= 5 && temp_status != TEMP_HT_39C) {
 					temp = temp - (50 + delta_temp);
-					printk(KERN_ERR "SJC-TEST 5: - %d\n", 50 + delta_temp);
 				} else if (cb_count >= 4) {
 					temp = temp - (40 + delta_temp);
-					printk(KERN_ERR "SJC-TEST 4: - %d\n", 40 + delta_temp);
 				} else if (cb_count >= 3) {
 					temp = temp - (30 + delta_temp);
-					printk(KERN_ERR "SJC-TEST 3: - %d\n", 30 + delta_temp);
 				} else if (cb_count >= 2) {
 					temp = temp - (20 + delta_temp);
-					printk(KERN_ERR "SJC-TEST 2: - %d\n", 20 + delta_temp);
 				} else if (cb_count >= 1) {
 					temp = temp - (10 + delta_temp);
-					printk(KERN_ERR "SJC-TEST 1: - %d\n", 10 + delta_temp);
 				}
 			}
 
@@ -939,7 +918,6 @@ static int  bq28z610_update_soc_smooth_parameter(void)
 	return 0;
 }
 
-static int gauge_reg_dump(void);
 static struct oppo_gauge_operations bq27541_gauge_ops = {
 	.get_battery_mvolts = bq27541_get_battery_mvolts,
 	.get_battery_temperature = bq27541_get_battery_temperature,
@@ -966,7 +944,6 @@ static struct oppo_gauge_operations bq27541_gauge_ops = {
 	.get_battery_cb_status = bq28z610_get_battery_balancing_status,
 	.get_gauge_i2c_err = bq27541_get_gauge_i2c_err,
 	.clear_gauge_i2c_err = bq27541_clear_gauge_i2c_err,
-	.dump_register = gauge_reg_dump,
 };
 
 static void gauge_set_cmd_addr(struct chip_bq27541 *chip, int device_type)

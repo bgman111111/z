@@ -618,6 +618,10 @@
 	qcom,platform-reset-gpio = <&tlmm 75 0>;
 };
 
+&sde_dsi {
+	qcom,dsi-default-panel = <&dsi_sw43404_amoled_cmd>;
+};
+
 //#ifdef OPLUS_BUG_STABILITY
 //lisheng@MULTIMEDIA.DISPLAY.LCD, 2020/07/23, modify panel config
 &sde_dsi {

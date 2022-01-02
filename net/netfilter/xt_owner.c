@@ -191,14 +191,14 @@ owner_mt(const struct sk_buff *skb, struct xt_action_param *par)
 	filp = sk->sk_socket->file;
 	if (filp == NULL)
 		return ((info->match ^ info->invert) &
-				(XT_OWNER_UID | XT_OWNER_GID)) == 0;
+		       (XT_OWNER_UID | XT_OWNER_GID)) == 0;
 
 	if (info->match & XT_OWNER_UID) {
 		kuid_t uid_min = make_kuid(net->user_ns, info->uid_min);
 		kuid_t uid_max = make_kuid(net->user_ns, info->uid_max);
 		if ((uid_gte(filp->f_cred->fsuid, uid_min) &&
-			uid_lte(filp->f_cred->fsuid, uid_max)) ^
-			!(info->invert & XT_OWNER_UID))
+		     uid_lte(filp->f_cred->fsuid, uid_max)) ^
+		    !(info->invert & XT_OWNER_UID))
 			return false;
 	}
 
@@ -206,8 +206,8 @@ owner_mt(const struct sk_buff *skb, struct xt_action_param *par)
 		kgid_t gid_min = make_kgid(net->user_ns, info->gid_min);
 		kgid_t gid_max = make_kgid(net->user_ns, info->gid_max);
 		if ((gid_gte(filp->f_cred->fsgid, gid_min) &&
-			gid_lte(filp->f_cred->fsgid, gid_max)) ^
-		 	!(info->invert & XT_OWNER_GID))
+		     gid_lte(filp->f_cred->fsgid, gid_max)) ^
+		    !(info->invert & XT_OWNER_GID))
 			return false;
 	}
 

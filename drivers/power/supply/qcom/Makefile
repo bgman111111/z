@@ -1,9 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
-
-#ifdef OPLUS_FEATURE_CHG_BASIC /* tongfeng.huang@BSP.CHG.Basic, 2019/06/21,  Modify for charging */
-obj-$(CONFIG_QPNP_SMB5)		+= step-chg-jeita.o battery.o pmic-voter.o storm-watch.o schgm-flash.o
-#else
-#obj-$(CONFIG_QPNP_SMB5)		+= step-chg-jeita.o battery.o qpnp-smb5.o smb5-lib.o pmic-voter.o storm-watch.o schgm-flash.o
+obj-$(CONFIG_SMB1360_CHARGER_FG)	+= smb1360-charger-fg.o
+#ifdef OPLUS_FEATURE_CHG_BASIC
+obj-$(CONFIG_QPNP_SMB5)			+= step-chg-jeita.o battery.o qpnp-smb5.o smb5-lib.o pmic-voter.o storm-watch.o schgm-flash.o
 #endif
 obj-$(CONFIG_SMB1390_CHARGE_PUMP_PSY)	+= smb1390-charger-psy.o pmic-voter.o
 obj-$(CONFIG_SMB1355_SLAVE_CHARGER)	+= smb1355-charger.o pmic-voter.o
@@ -17,3 +15,5 @@ obj-$(CONFIG_QPNP_QG)			+= qpnp-qg.o pmic-voter.o qg-util.o qg-soc.o qg-sdam.o q
 obj-$(CONFIG_HL6111R)			+= hl6111r.o
 obj-$(CONFIG_SMB1398_CHARGER)		+= smb1398-charger.o pmic-voter.o
 obj-$(CONFIG_QPNP_SMBLITE)		+= step-chg-jeita.o battery.o qpnp-smblite.o smblite-lib.o pmic-voter.o storm-watch.o schgm-flashlite.o
+obj-$(CONFIG_QPNP_VM_BMS)		+= qpnp-vm-bms.o batterydata-lib.o batterydata-interface.o
+obj-$(CONFIG_QPNP_LINEAR_CHARGER)	+= qpnp-linear-charger.o

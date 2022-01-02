@@ -14,8 +14,8 @@
 * Revision 1.1     2018-04-12        Fanhong.Kong@BSP.CHG.Basic        divided for svooc from oppo_vooc.c 
 ************************************************************************************************************/
 
-//#ifndef _OPPO_ADAPTER_H_
-//#define _OPPO_ADAPTER_H_
+#ifndef _OPPO_ADAPTER_H_
+#define _OPPO_ADAPTER_H_
 
 #include <linux/workqueue.h>
 #include <linux/version.h>
@@ -58,4 +58,4 @@ bool oppo_vooc_check_chip_is_null(void);
 void oppo_adapter_init(struct oppo_adapter_chip *chip);
 bool oppo_adapter_check_chip_is_null(void);
 
-//#endif /* _OPPO_ADAPTER_H_ */
+#endif /* _OPPO_ADAPTER_H_ */

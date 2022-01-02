@@ -239,16 +239,16 @@ static int cam_ois_apply_settings(struct cam_ois_ctrl_t *o_ctrl,
 		&(i2c_set->list_head), list) {
 		if (i2c_list->op_code ==  CAM_SENSOR_I2C_WRITE_RANDOM) {
 #ifdef VENDOR_EDIT
-                     rc = cam_ois_apply_settings_oem(o_ctrl,i2c_list);
+			rc = cam_ois_apply_settings_oem(o_ctrl,i2c_list);
 #else
-		       rc = camera_io_dev_write(&(o_ctrl->io_master_info),
-			     &(i2c_list->i2c_settings));
+			rc = camera_io_dev_write(&(o_ctrl->io_master_info),
+				&(i2c_list->i2c_settings));
 #endif
-		       if (rc < 0) {
-			     CAM_ERR(CAM_OIS,
-		                  "Failed in Applying i2c wrt settings");
-			     return rc;
-		       }
+			if (rc < 0) {
+				CAM_ERR(CAM_OIS,
+					"Failed in Applying i2c wrt settings");
+				return rc;
+			}
 		} else if (i2c_list->op_code == CAM_SENSOR_I2C_POLL) {
 			size = i2c_list->i2c_settings.size;
 			for (i = 0; i < size; i++) {
@@ -379,7 +379,6 @@ static int cam_ois_fw_download(struct cam_ois_ctrl_t *o_ctrl)
 
 	rc = camera_io_dev_write_continuous(&(o_ctrl->io_master_info),
 		&i2c_reg_setting, 1);
-
 	if (rc < 0) {
 		CAM_ERR(CAM_OIS, "OIS FW download failed %d", rc);
 		goto release_firmware;
@@ -425,7 +424,6 @@ static int cam_ois_fw_download(struct cam_ois_ctrl_t *o_ctrl)
 
 	rc = camera_io_dev_write_continuous(&(o_ctrl->io_master_info),
 		&i2c_reg_setting, 1);
-
 	if (rc < 0)
 		CAM_ERR(CAM_OIS, "OIS FW download failed %d", rc);
 
@@ -461,7 +459,6 @@ static int cam_ois_pkt_parse(struct cam_ois_ctrl_t *o_ctrl, void *arg)
 	struct cam_packet              *csl_packet = NULL;
 	size_t                          len_of_buff = 0;
 	uint32_t                       *offset = NULL, *cmd_buf;
-
 	struct cam_ois_soc_private     *soc_private =
 		(struct cam_ois_soc_private *)o_ctrl->soc_info.soc_private;
 	struct cam_sensor_power_ctrl_t  *power_info = &soc_private->power_info;
@@ -614,11 +611,11 @@ static int cam_ois_pkt_parse(struct cam_ois_ctrl_t *o_ctrl, void *arg)
 		}
 
 #ifdef VENDOR_EDIT
-               rc = oplus_cam_ois_pkt_parse(o_ctrl);
-               if (rc) {
-                    CAM_ERR(CAM_OIS, "Failed OIS pkt_parse");
-                    goto pwr_dwn;
-               }
+		rc = oplus_cam_ois_pkt_parse(o_ctrl);
+		if (rc) {
+			CAM_ERR(CAM_OIS, "Failed OIS pkt_parse");
+			goto pwr_dwn;
+		}
 #else
 		if (o_ctrl->ois_fw_flag) {
 			rc = cam_ois_fw_download(o_ctrl);
@@ -627,7 +624,7 @@ static int cam_ois_pkt_parse(struct cam_ois_ctrl_t *o_ctrl, void *arg)
 				goto pwr_dwn;
 			}
 		}
-		#endif
+#endif
 
 		rc = cam_ois_apply_settings(o_ctrl, &o_ctrl->i2c_init_data);
 #ifdef VENDOR_EDIT
@@ -672,7 +669,6 @@ static int cam_ois_pkt_parse(struct cam_ois_ctrl_t *o_ctrl, void *arg)
 				"Fail deleting Calibration data: rc: %d", rc);
 			rc = 0;
 		}
-
 		break;
 	case CAM_OIS_PACKET_OPCODE_OIS_CONTROL:
 		if (o_ctrl->cam_ois_state < CAM_OIS_CONFIG) {
@@ -718,7 +714,6 @@ static int cam_ois_pkt_parse(struct cam_ois_ctrl_t *o_ctrl, void *arg)
 				"Fail deleting Mode data: rc: %d", rc);
 			return rc;
 		}
-
 		break;
 	case CAM_OIS_PACKET_OPCODE_READ: {
 		struct cam_buf_io_cfg *io_cfg;
@@ -914,9 +909,6 @@ int cam_ois_driver_cmd(struct cam_ois_ctrl_t *o_ctrl, void *arg)
 		}
 		break;
 	case CAM_RELEASE_DEV:
-		CAM_INFO(CAM_OIS, "CAM_RELEASE_DEV: %d",
-			o_ctrl->cam_ois_state);
-
 		if (o_ctrl->cam_ois_state == CAM_OIS_START) {
 			rc = -EINVAL;
 			CAM_WARN(CAM_OIS,

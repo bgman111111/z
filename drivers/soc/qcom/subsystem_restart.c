@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Copyright (c) 2011-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2021, The Linux Foundation. All rights reserved.
  */
 
 #define pr_fmt(fmt) "subsys-restart: %s(): " fmt, __func__
@@ -33,8 +33,6 @@
 #include <linux/of.h>
 #include <asm/current.h>
 #include <linux/timer.h>
-#include <linux/seq_file.h>
-#include <linux/proc_fs.h>
 
 #include "peripheral-loader.h"
 #ifdef VENDOR_EDIT
@@ -491,6 +489,7 @@ static DEFINE_MUTEX(restart_log_mutex);
 //tangjh@PSW.BSP.SENSOR ,2020/07/27 add for slpi/adsp crash reason
 //static DEFINE_MUTEX(subsys_list_lock);
 //#endif
+static DEFINE_MUTEX(subsys_list_lock);
 static DEFINE_MUTEX(char_device_lock);
 static DEFINE_MUTEX(ssr_order_mutex);
 
@@ -855,6 +854,7 @@ static int subsystem_powerup(struct subsys_device *dev, void *data)
 	pr_info("[%s:%d]: Powering up %s\n", current->comm, current->pid, name);
 	reinit_completion(&dev->err_ready);
 
+	enable_all_irqs(dev);
 	ret = dev->desc->powerup(dev->desc);
 	if (ret < 0) {
 		notify_each_subsys_device(&dev, 1, SUBSYS_POWERUP_FAILURE,
@@ -870,7 +870,6 @@ static int subsystem_powerup(struct subsys_device *dev, void *data)
 			pr_err("Powerup failure on %s\n", name);
 		return ret;
 	}
-	enable_all_irqs(dev);
 
 	ret = wait_for_err_ready(dev);
 	if (ret) {
@@ -2148,66 +2147,10 @@ static struct notifier_block panic_nb = {
 	.notifier_call  = ssr_panic_handler,
 };
 
-extern bool ts_wait_error;
-extern bool ts_send_error;
-#ifdef CONFIG_ESOC_MDM_4x
-extern bool modem_force_rst;
-#endif
-
-static ssize_t force_rst_write(struct file *file,
-				const char __user *buf,
-				size_t count,
-				loff_t *lo)
-{
-	char read_buf[4] = {0};
-	struct subsys_device *subsys = find_subsys_device("esoc0");
-
-	if (!subsys)
-		return 0;
-
-	if (copy_from_user(read_buf, buf, 1)) {
-		pr_err("%s: failed to copy from user.\n", __func__);
-		return count;
-	}
-
-	pr_info("%s: %s\n", __func__, read_buf);
-
-	if (!strncmp(read_buf, "2", 1)) {
-		panic("force esoc crash");
-	}
-
-	if (!strncmp(read_buf, "1", 1) && (ts_send_error || ts_wait_error)) {
-#ifdef CONFIG_ESOC_MDM_4x
-		modem_force_rst = true;
-#endif
-		ts_wait_error = false;
-		ts_send_error = false;
-		pr_err("force to reset modem\n");
-		op_restart_modem(subsys);
-	}
-
-	return count;
-}
-
-static ssize_t force_rst_read(struct file *file,
-				char __user *buf,
-				size_t count,
-				loff_t *ppos)
-{
-	return count;
-}
-
-static const struct file_operations esoc_force_rst_fops = {
-    .write = force_rst_write,
-    .read  = force_rst_read,
-    .open  = simple_open,
-    .owner = THIS_MODULE,
-};
-
 static int __init subsys_restart_init(void)
 {
 	int ret;
-	struct proc_dir_entry *d_entry = NULL;
+
 	ssr_wq = alloc_workqueue("ssr_wq",
 		WQ_UNBOUND | WQ_HIGHPRI | WQ_CPU_INTENSIVE, 0);
 	BUG_ON(!ssr_wq);
@@ -2227,11 +2170,6 @@ static int __init subsys_restart_init(void)
 			&panic_nb);
 	if (ret)
 		goto err_soc;
-
-	d_entry = proc_create_data("force_reset", 0666, NULL, &esoc_force_rst_fops, NULL);
-	if (!d_entry) {
-		goto err_soc;
-	}
 
 	return 0;
 

@@ -15,7 +15,9 @@
 #include <linux/seq_file.h>
 #include <linux/debugfs.h>
 #include <linux/pm_wakeirq.h>
-#include <linux/types.h>
+#include <linux/irq.h>
+#include <linux/irqdesc.h>
+#include <linux/wakeup_reason.h>
 #include <trace/events/power.h>
 #ifdef OPLUS_FEATURE_LOGKIT
 //Yanzhen.Feng@ANDROID.DEBUG.702252, 2016/06/21, Add for Sync App and Kernel time
@@ -718,6 +720,7 @@ static void wakeup_source_deactivate(struct wakeup_source *ws)
         }
 	#endif
 	trace_wakeup_source_deactivate(ws->name, cec);
+
 	split_counters(&cnt, &inpr);
 	if (!inpr && waitqueue_active(&wakeup_count_wait_queue)) {
 		#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
@@ -968,6 +971,7 @@ bool pm_wakeup_pending(void)
 {
 	unsigned long flags;
 	bool ret = false;
+	char suspend_abort[MAX_SUSPEND_ABORT_LEN];
 
 	raw_spin_lock_irqsave(&events_lock, flags);
 	if (events_check_enabled) {
@@ -1014,19 +1018,15 @@ void pm_wakeup_clear(bool reset)
 
 void pm_system_irq_wakeup(unsigned int irq_number)
 {
-	struct irq_desc *desc;
-	const char *name = "null";
-
 	if (pm_wakeup_irq == 0) {
-		if (msm_show_resume_irq_mask) {
-			desc = irq_to_desc(irq_number);
-			if (desc == NULL)
-				name = "stray irq";
-			else if (desc->action && desc->action->name)
-				name = desc->action->name;
+		struct irq_desc *desc;
+		const char *name = "null";
 
-			pr_warn("%s: %d triggered %s\n", __func__,
-				irq_number, name);
+		desc = irq_to_desc(irq_number);
+		if (desc == NULL)
+			name = "stray irq";
+		else if (desc->action && desc->action->name)
+			name = desc->action->name;
 
 			#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
 			//SunFaliang@BSP.Power.Basic, 2020/05/01, add for analysis power coumption.
@@ -1273,8 +1273,6 @@ static int __init wakeup_sources_debugfs_init(void)
 	wakeup_sources_stats_dentry = debugfs_create_file("wakeup_sources",
 			S_IRUGO| S_IWUGO, NULL, NULL, &wakeup_sources_stats_fops);
 	#endif /* OPLUS_FEATURE_LOGKIT */
-
-	proc_create_data("wakeup_sources", 0444, NULL, &wakeup_sources_stats_fops, NULL);
 
 	return 0;
 }

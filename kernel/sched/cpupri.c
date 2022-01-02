@@ -85,9 +85,6 @@ extern void drop_ux_task_cpus(struct task_struct *p, struct cpumask *lowest_mask
  *
  * Return: (int)bool - CPUs were found
  */
-extern bool ux_task_misfit(struct task_struct *p, int cpu);
-extern int ux_prefer_cpu[];
-extern void kick_min_cpu_from_mask(struct cpumask *lowest_mask);
 int cpupri_find(struct cpupri *cp, struct task_struct *p,
 		struct cpumask *lowest_mask)
 {
